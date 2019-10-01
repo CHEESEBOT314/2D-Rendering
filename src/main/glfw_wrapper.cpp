@@ -4,7 +4,7 @@
 
 namespace glfw_wrapper {
     namespace {
-        // Place "private members" in here
+        //--Place "private members" in here--//
         struct Info {
             GLFWwindow *window;
         };

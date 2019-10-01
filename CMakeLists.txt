@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(MScFinalProject)
-set(CMAKE_C_STANDARD   11)
-set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
                 ### GLFW SETUP ###
 ###============================================###
@@ -12,6 +12,8 @@ set(GLFW_BUILD_TESTS      OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL          OFF CACHE BOOL "" FORCE)
 add_subdirectory(glfw)
 ###============================================###
+
+set(ENV{VULKAN_SDK} "/Users/eddie/vulkansdk-macos-1.1.121.1/macOS")
 
 find_package(Vulkan REQUIRED)
 
