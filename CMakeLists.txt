@@ -21,10 +21,13 @@ if (DEBUG)
     add_definitions(-DDEBUG_MODE)
 endif()
 
-set(SOURCES src/main/main.cpp
+set(SOURCES src/main/Main.cpp
 
-        src/main/glfw_wrapper.cpp
-        src/main/vulkan_wrapper.cpp)
+            src/main/GlfwWrapper.cpp
+            src/main/Game.cpp
+            src/main/VulkanWrapper.cpp
+
+            src/main/render/RenderManager.cpp)
 
 file(GLOB_RECURSE SHADERS shaders/*.glsl)
 
