@@ -27,7 +27,9 @@ set(SOURCES src/main/Main.cpp
             src/main/Game.cpp
             src/main/VulkanWrapper.cpp
 
-            src/main/render/RenderManager.cpp)
+            src/main/render/RenderManager.cpp
+
+            src/main/platform/Windows.cpp)
 
 file(GLOB_RECURSE SHADERS shaders/*.glsl)
 

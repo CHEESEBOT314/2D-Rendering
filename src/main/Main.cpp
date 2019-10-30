@@ -12,6 +12,7 @@ int main(int argc, char** args) {
         !VulkanWrapper::createOthers()) {
         return 0;
     }
+    
     Game::init();
 
     while (!(GlfwWrapper::shouldQuit() || Game::shouldQuit())) {
