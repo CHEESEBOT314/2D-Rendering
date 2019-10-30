@@ -1,6 +1,8 @@
 #include "Game.hpp"
 #include "GlfwWrapper.hpp"
 #include "VulkanWrapper.hpp"
+#include "platform/Platform.hpp"
+#include "resource/ResourceManager.hpp"
 
 int main(int argc, char** args) {
     std::vector<const char*> extensions = GlfwWrapper::init();
@@ -12,7 +14,7 @@ int main(int argc, char** args) {
         !VulkanWrapper::createOthers()) {
         return 0;
     }
-    
+    ResourceManager::init(Platform::Files::getResourceFolder(), Platform::Files::FILE_SEPARATOR);
     Game::init();
 
     while (!(GlfwWrapper::shouldQuit() || Game::shouldQuit())) {

@@ -5,6 +5,7 @@
 
 namespace Platform {
     namespace Files {
+        extern const char FILE_SEPARATOR;
         std::string getResourceFolder();
         void createFolder(const std::string& folder);
     }

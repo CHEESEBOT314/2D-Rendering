@@ -10,7 +10,7 @@ namespace VulkanWrapper {
     bool createOthers();
     bool createSwapchain();
 
-    bool createShaderModule(vk::ShaderModule& shaderModule, const std::vector<char>& src);
+    bool createShaderModule(vk::ShaderModule& shaderModule, const std::vector<uint8_t>& src);
     void destroyShaderModule(const vk::ShaderModule& shaderModule);
 
     bool createPipelineLayout();

@@ -29,6 +29,8 @@ set(SOURCES src/main/Main.cpp
 
             src/main/render/RenderManager.cpp
 
+            src/main/resource/ResourceManager.cpp
+
             src/main/platform/Windows.cpp)
 
 file(GLOB_RECURSE SHADERS shaders/*.glsl)

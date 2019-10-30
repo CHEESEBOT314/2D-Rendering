@@ -378,7 +378,7 @@ namespace VulkanWrapper {
         return true;
     }
 
-    bool createShaderModule(vk::ShaderModule& shaderModule, const std::vector<char>& src) {
+    bool createShaderModule(vk::ShaderModule& shaderModule, const std::vector<uint8_t>& src) {
         vk::ShaderModuleCreateInfo shaderModuleCreateInfo = {vk::ShaderModuleCreateFlags(), src.size(), reinterpret_cast<const uint32_t*>(src.data())};
         shaderModule = info->device.createShaderModule(shaderModuleCreateInfo);
         return true;

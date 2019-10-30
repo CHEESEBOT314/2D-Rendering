@@ -1,6 +1,7 @@
 #include "render/RenderManager.hpp"
 
 #include "VulkanWrapper.hpp"
+#include "resource/ResourceManager.hpp"
 
 #include <map>
 
@@ -14,16 +15,28 @@ namespace RenderManager {
         struct Info {
             std::map<std::string, uint32_t> nameToIdMap;
             std::map<uint32_t, Pipeline> idToPipelineMap;
-            uint32_t nextId;
+            uint32_t nextId = 1;
             bool loaded = false;
-            bool handled = false;
         };
         std::unique_ptr<Info> info;
 
         bool loadPipeline(const std::string& name, Pipeline& pipeline) {
+            vk::ShaderModule vert, frag;
+            if (!VulkanWrapper::createShaderModule(vert, ResourceManager::readBinaryFile(name + ".vs.spv", {"shaders"})) ||
+                !VulkanWrapper::createShaderModule(frag, ResourceManager::readBinaryFile(name + ".fs.spv", {"shaders"}))) {
+                return false;
+            }
+            vk::PipelineShaderStageCreateInfo shaderStageCreateInfos[2];
+            shaderStageCreateInfos[0] = vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(), vk::ShaderStageFlagBits::eVertex, vert, "main");
+            shaderStageCreateInfos[1] = vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(), vk::ShaderStageFlagBits::eFragment, frag, "main");
+
 
             return true;
         }
+    }
+    void init() {
+        info = std::make_unique<Info>();
+
     }
 
     bool createGraphicsPipeline(const std::string& name) {

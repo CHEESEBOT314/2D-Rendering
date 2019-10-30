@@ -4,6 +4,8 @@
 #include <string>
 
 namespace RenderManager {
+    void init();
+
     bool createGraphicsPipeline(const std::string& name);
     uint32_t getPipelineID(const std::string& name);
 

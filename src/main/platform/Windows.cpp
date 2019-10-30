@@ -1,17 +1,16 @@
 #include "platform/Platform.hpp"
 
-#include "Windows.h"
+#include "windows.h"
 
-namespace Platform {
-    namespace Files {
-        std::string getResourceFolder() {
-            HMODULE hModule = GetModuleHandle(NULL);
-            char path[MAX_PATH];
-            GetModuleFilename(NULL, path, sizeof(path));
-            return std::string(path);
-        }
-        void createFolder(const std::string& folder) {
-
-        }
+namespace Platform::Files {
+    const char FILE_SEPARATOR = '\\';
+    std::string getResourceFolder() {
+        HMODULE hModule = GetModuleHandle(nullptr);
+        char path[MAX_PATH];
+        GetModuleFileName(nullptr, path, sizeof(path));
+        std::string pathStr = std::string(path);
+        return pathStr.substr(0, pathStr.find_last_of('\\') + 1).append("resources\\");
+    }
+    void createFolder(const std::string& folder) {
     }
 }

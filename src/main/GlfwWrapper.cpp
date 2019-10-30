@@ -22,7 +22,6 @@ namespace GlfwWrapper {
 
                 GLFWmonitor* monitor = glfwGetPrimaryMonitor();
                 const GLFWvidmode* vidmode = glfwGetVideoMode(monitor);
-                printf("%dx%d", vidmode->width, vidmode->height);
 
                 GLFWwindow* w = glfwCreateWindow(vidmode->width, vidmode->height, "2D", monitor, nullptr);
                 if (w) {
