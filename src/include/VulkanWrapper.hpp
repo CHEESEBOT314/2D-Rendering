@@ -13,8 +13,8 @@ namespace VulkanWrapper {
     bool createShaderModule(vk::ShaderModule& shaderModule, const std::vector<uint8_t>& src);
     void destroyShaderModule(const vk::ShaderModule& shaderModule);
 
-    bool createPipelineLayout();
-    void destroyPipelineLayout();
+    bool createPipelineLayout(vk::PipelineLayout& pipelineLayout, const vk::PipelineLayoutCreateInfo& pipelineLayoutCreateInfo);
+    void destroyPipelineLayout(const vk::PipelineLayout& pipelineLayout);
     bool createPipeline();
     void destroyPipeline();
 

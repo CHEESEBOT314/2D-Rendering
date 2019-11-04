@@ -197,9 +197,9 @@ namespace VulkanWrapper {
 #ifdef DEBUG_MODE
         static_cast<uint32_t>(validationLayers.size()), validationLayers.data(),
 #else
-        0, nullptr,
+            0, nullptr,
 #endif
-                extensions.size(), extensions.data()};
+            static_cast<uint32_t>(extensions.size()), extensions.data()};
 
         info->instance = vk::createInstance(createInfo);
         info->dldi = vk::DispatchLoaderDynamic(info->instance);
@@ -387,9 +387,34 @@ namespace VulkanWrapper {
         info->device.destroyShaderModule(shaderModule);
     }
 
+    bool createPipelineLayout(vk::PipelineLayout& pipelineLayout, const vk::PipelineLayoutCreateInfo& pipelineLayoutCreateInfo) {
+        pipelineLayout = info->device.createPipelineLayout(pipelineLayoutCreateInfo);
+        return !!pipelineLayout;
+    }
+    void destroyPipelineLayout(const vk::PipelineLayout& pipelineLayout) {
+        info->device.destroyPipelineLayout(pipelineLayout);
+    }
+    bool createPipeline(vk::Pipeline& pipeline, uint32_t shaderModuleCount, const vk::PipelineShaderStageCreateInfo* shaderModules, uint32_t vertexBindingDescriptionCount, const vk::VertexInputBindingDescription* vertexBindingDescriptions, uint32_t vertexAttributeDescriptionCount, const vk::VertexInputAttributeDescription* vertexAttributeDescriptions) {
+        vk::PipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo = {vk::PipelineVertexInputStateCreateFlags(), vertexBindingDescriptionCount, vertexBindingDescriptions, vertexAttributeDescriptionCount, vertexAttributeDescriptions};
+        vk::PipelineInputAssemblyStateCreateInfo pipelineAssemblyStateCreateInfo = {vk::PipelineInputAssemblyStateCreateFlags(), vk::PrimitiveTopology::eTriangleList, VK_FALSE};
+        vk::Viewport viewport = {0.0f, 0.0f, (float)info->swapchainExtent.width, (float)info->swapchainExtent.height, 0.0f, 1.0f};
+        vk::Rect2D scissor = {{0, 0}, info->swapchainExtent};
+        vk::PipelineViewportStateCreateInfo pipelineViewportStateCreateInfo = {vk::PipelineViewportStateCreateFlags(), 1, &viewport, 1, &scissor};
+        vk::PipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo = {vk::PipelineRasterizationStateCreateFlags(), VK_FALSE, VK_FALSE, vk::PolygonMode::eFill, vk::CullModeFlagBits::eBack, vk::FrontFace::eClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f};
+
+
+
+
+
+        const vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {vk::PipelineCreateFlags(), shaderModuleCount, shaderModules, &pipelineVertexInputStateCreateInfo, &pipelineAssemblyStateCreateInfo, nullptr, &pipelineViewportStateCreateInfo, &pipelineRasterizationStateCreateInfo};
+    }
+    void destroyPipeline() {
+
+    }
+
     bool renderFrame(void (*externalRender)()) {
         info->device.waitForFences(1, &info->inFlightFences[info->currentFrame], VK_TRUE, std::numeric_limits<uint64_t >::max());
-        vk::ResultValue<uint32_t> resultValue = info->device.acquireNextImageKHR(info->swapchain, 0, info->imageAvailableSemaphores[info->currentFrame], VK_NULL_HANDLE);
+        vk::ResultValue<uint32_t> resultValue = info->device.acquireNextImageKHR(info->swapchain, 0, info->imageAvailableSemaphores[info->currentFrame], vk::Fence());
         if (resultValue.result == vk::Result::eErrorOutOfDateKHR) {
             if (reloadSwapchain()) {
                 return renderFrame(externalRender);

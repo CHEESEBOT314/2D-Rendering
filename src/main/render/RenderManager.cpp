@@ -30,6 +30,12 @@ namespace RenderManager {
             shaderStageCreateInfos[0] = vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(), vk::ShaderStageFlagBits::eVertex, vert, "main");
             shaderStageCreateInfos[1] = vk::PipelineShaderStageCreateInfo(vk::PipelineShaderStageCreateFlags(), vk::ShaderStageFlagBits::eFragment, frag, "main");
 
+            vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {vk::PipelineLayoutCreateFlags(), 0, nullptr, 0, nullptr};
+            if (!VulkanWrapper::createPipelineLayout(pipeline.layout, pipelineLayoutCreateInfo)) {
+                VulkanWrapper::destroyShaderModule(vert);
+                VulkanWrapper::destroyShaderModule(frag);
+                return false;
+            }
 
             return true;
         }
