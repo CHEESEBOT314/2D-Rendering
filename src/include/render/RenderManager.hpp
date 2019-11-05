@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace RenderManager {
+namespace render::RenderManager {
     void init();
 
     bool createGraphicsPipeline(const std::string& name);
@@ -16,6 +16,8 @@ namespace RenderManager {
     bool loadShaders();
     void unloadShaders();
     bool reloadShaders();
+
+    void terminate();
 }
 
 #endif//MSCFINALPROJECT_RENDER_RENDERMANAGER_HPP

@@ -8,8 +8,9 @@ namespace Game {
     void handleEvent();
     void update();
 
-
     bool shouldQuit();
+
+    void terminate();
 }
 
 #endif//MSCFINALPROJECT_GAME_HPP

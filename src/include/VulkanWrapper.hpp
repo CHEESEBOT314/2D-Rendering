@@ -6,7 +6,7 @@
 namespace VulkanWrapper {
 
     bool createInstance(std::vector<const char*> extensions);
-    bool createSurface(bool(*fn)(vk::Instance, vk::SurfaceKHR*), void (*r)(int*, int*));
+    bool createSurface(bool(*fn)(const vk::Instance&, vk::SurfaceKHR&), void (*r)(int*, int*));
     bool createOthers();
     bool createSwapchain();
 
@@ -15,8 +15,8 @@ namespace VulkanWrapper {
 
     bool createPipelineLayout(vk::PipelineLayout& pipelineLayout, const vk::PipelineLayoutCreateInfo& pipelineLayoutCreateInfo);
     void destroyPipelineLayout(const vk::PipelineLayout& pipelineLayout);
-    bool createPipeline();
-    void destroyPipeline();
+    bool createPipeline(vk::Pipeline& pipeline, const vk::PipelineLayout& pipelineLayout, uint32_t shaderModuleCount, const vk::PipelineShaderStageCreateInfo* shaderModules, uint32_t vertexBindingDescriptionCount, const vk::VertexInputBindingDescription* vertexBindingDescriptions, uint32_t vertexAttributeDescriptionCount, const vk::VertexInputAttributeDescription* vertexAttributeDescriptions);
+    void destroyPipeline(const vk::Pipeline& pipeline);
 
     bool renderFrame(void (*externalRender)());
 
@@ -25,6 +25,8 @@ namespace VulkanWrapper {
 
     bool reloadSwapchain();
     void destroySwapchain();
+
+    void waitIdle();
     void terminate();
 }
 

@@ -39,5 +39,8 @@ set(APP_NAME "2D")
 
 add_executable(${APP_NAME} ${SOURCES})
 
+add_custom_command(TARGET ${APP_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/resources ${PROJECT_SOURCE_DIR}/bin/resources)
+
 target_link_libraries(${APP_NAME} glfw Vulkan::Vulkan)
 target_include_directories(${APP_NAME} PRIVATE src/include glfw/include Vulkan::Vulkan)
+

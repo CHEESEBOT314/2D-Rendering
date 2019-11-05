@@ -6,7 +6,7 @@
 
 namespace GlfwWrapper {
     std::vector<const char*> init();
-    bool createSurface(vk::Instance instance, vk::SurfaceKHR* surfaceKhr);
+    bool createSurface(const vk::Instance& instance, vk::SurfaceKHR& surfaceKhr);
 
     void getResolution(int* width, int* height);
 

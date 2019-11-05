@@ -35,11 +35,11 @@ namespace GlfwWrapper {
         return extensions;
     }
 
-    bool createSurface(vk::Instance instance, vk::SurfaceKHR* surfaceKhr) {
+    bool createSurface(const vk::Instance& instance, vk::SurfaceKHR& surfaceKhr) {
         if (info && info->window) {
             VkSurfaceKHR tSurf;
             VkResult result = glfwCreateWindowSurface(VkInstance(instance), info->window, nullptr, &tSurf);
-            *surfaceKhr = vk::SurfaceKHR(tSurf);
+            surfaceKhr = vk::SurfaceKHR(tSurf);
             return result == VK_SUCCESS;
         }
         return false;
@@ -61,6 +61,7 @@ namespace GlfwWrapper {
             glfwDestroyWindow(info->window);
         }
         glfwTerminate();
+        info.reset(nullptr);
     }
 }
 

@@ -3,7 +3,7 @@
 #include <memory>
 #include <fstream>
 
-namespace ResourceManager {
+namespace resource::ResourceManager {
     namespace {
         struct Info {
             std::string folder;

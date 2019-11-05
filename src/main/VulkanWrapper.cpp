@@ -34,6 +34,7 @@ namespace VulkanWrapper {
             std::vector<vk::Semaphore> imageAvailableSemaphores;
             std::vector<vk::Semaphore> renderFinishedSemaphores;
             std::vector<vk::Fence> inFlightFences;
+            std::vector<vk::Fence> imagesInFlight;
 
             size_t currentFrame = 0;
             bool draw = false;
@@ -208,10 +209,10 @@ namespace VulkanWrapper {
 #endif
         return true;
     }
-    bool createSurface(bool(*fn)(vk::Instance, vk::SurfaceKHR*), void (*r)(int*, int*)) {
+    bool createSurface(bool(*fn)(const vk::Instance&, vk::SurfaceKHR&), void (*r)(int*, int*)) {
         if (info) {
             resolutionFunction = r;
-            return fn(info->instance, &info->surface);
+            return fn(info->instance, info->surface);
         }
         return false;
     }
@@ -269,7 +270,7 @@ namespace VulkanWrapper {
         //// COMMAND POOLS ////
         ///////////////////////
         info->commands.resize(MAX_FRAMES_IN_FLIGHT);
-        vk::CommandPoolCreateInfo commandPoolCreateInfo = {vk::CommandPoolCreateFlags(), findQueueFamilies(info->physicalDevice).graphicsFamily.value()};
+        vk::CommandPoolCreateInfo commandPoolCreateInfo = {vk::CommandPoolCreateFlags(), indices.graphicsFamily.value()};
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             info->commands[i].pool = info->device.createCommandPool(commandPoolCreateInfo);
         }
@@ -277,7 +278,7 @@ namespace VulkanWrapper {
         /////////////////////////
         //// COMMAND BUFFERS ////
         /////////////////////////
-        for (Command cmd : info->commands) {
+        for (Command& cmd : info->commands) {
             cmd.buffers.resize(1);
             vk::CommandBufferAllocateInfo commandBufferAllocateInfo = {cmd.pool, vk::CommandBufferLevel::ePrimary, 1};
             cmd.buffers = info->device.allocateCommandBuffers(commandBufferAllocateInfo);
@@ -291,7 +292,7 @@ namespace VulkanWrapper {
         info->inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
         vk::SemaphoreCreateInfo semaphoreCreateInfo = {vk::SemaphoreCreateFlags()};
-        vk::FenceCreateInfo fenceCreateInfo = {vk::FenceCreateFlags()};
+        vk::FenceCreateInfo fenceCreateInfo = {vk::FenceCreateFlagBits::eSignaled};
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             info->imageAvailableSemaphores[i] = info->device.createSemaphore(semaphoreCreateInfo);
             info->renderFinishedSemaphores[i] = info->device.createSemaphore(semaphoreCreateInfo);
@@ -375,6 +376,7 @@ namespace VulkanWrapper {
 
             info->swapchainFramebuffers[i] = info->device.createFramebuffer(framebufferCreateInfo);
         }
+        info->imagesInFlight.resize(info->swapchainImages.size(), VK_NULL_HANDLE);
         return true;
     }
 
@@ -394,27 +396,28 @@ namespace VulkanWrapper {
     void destroyPipelineLayout(const vk::PipelineLayout& pipelineLayout) {
         info->device.destroyPipelineLayout(pipelineLayout);
     }
-    bool createPipeline(vk::Pipeline& pipeline, uint32_t shaderModuleCount, const vk::PipelineShaderStageCreateInfo* shaderModules, uint32_t vertexBindingDescriptionCount, const vk::VertexInputBindingDescription* vertexBindingDescriptions, uint32_t vertexAttributeDescriptionCount, const vk::VertexInputAttributeDescription* vertexAttributeDescriptions) {
+    bool createPipeline(vk::Pipeline& pipeline, const vk::PipelineLayout& pipelineLayout, uint32_t shaderModuleCount, const vk::PipelineShaderStageCreateInfo* shaderModules, uint32_t vertexBindingDescriptionCount, const vk::VertexInputBindingDescription* vertexBindingDescriptions, uint32_t vertexAttributeDescriptionCount, const vk::VertexInputAttributeDescription* vertexAttributeDescriptions) {
         vk::PipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo = {vk::PipelineVertexInputStateCreateFlags(), vertexBindingDescriptionCount, vertexBindingDescriptions, vertexAttributeDescriptionCount, vertexAttributeDescriptions};
         vk::PipelineInputAssemblyStateCreateInfo pipelineAssemblyStateCreateInfo = {vk::PipelineInputAssemblyStateCreateFlags(), vk::PrimitiveTopology::eTriangleList, VK_FALSE};
         vk::Viewport viewport = {0.0f, 0.0f, (float)info->swapchainExtent.width, (float)info->swapchainExtent.height, 0.0f, 1.0f};
         vk::Rect2D scissor = {{0, 0}, info->swapchainExtent};
         vk::PipelineViewportStateCreateInfo pipelineViewportStateCreateInfo = {vk::PipelineViewportStateCreateFlags(), 1, &viewport, 1, &scissor};
         vk::PipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo = {vk::PipelineRasterizationStateCreateFlags(), VK_FALSE, VK_FALSE, vk::PolygonMode::eFill, vk::CullModeFlagBits::eBack, vk::FrontFace::eClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f};
+        vk::PipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo = {vk::PipelineMultisampleStateCreateFlags(), vk::SampleCountFlagBits::e1, VK_FALSE, 1.0f, nullptr, VK_FALSE, VK_FALSE};
+        vk::PipelineColorBlendAttachmentState pipelineColorBlendAttachmentState = {VK_TRUE, vk::BlendFactor::eSrcAlpha, vk::BlendFactor::eOneMinusSrcAlpha, vk::BlendOp::eAdd, vk::BlendFactor::eOne, vk::BlendFactor::eZero, vk::BlendOp::eAdd, vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA};
+        vk::PipelineColorBlendStateCreateInfo pipelineColorBlendStateCreateInfo = {vk::PipelineColorBlendStateCreateFlags(), VK_FALSE, vk::LogicOp::eCopy, 1, &pipelineColorBlendAttachmentState, {0.0f, 0.0f, 0.0f, 0.0f}};
 
-
-
-
-
-        const vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {vk::PipelineCreateFlags(), shaderModuleCount, shaderModules, &pipelineVertexInputStateCreateInfo, &pipelineAssemblyStateCreateInfo, nullptr, &pipelineViewportStateCreateInfo, &pipelineRasterizationStateCreateInfo};
+        vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {vk::PipelineCreateFlags(), shaderModuleCount, shaderModules, &pipelineVertexInputStateCreateInfo, &pipelineAssemblyStateCreateInfo, nullptr, &pipelineViewportStateCreateInfo, &pipelineRasterizationStateCreateInfo, &pipelineMultisampleStateCreateInfo, nullptr, &pipelineColorBlendStateCreateInfo, nullptr, pipelineLayout, info->renderPass, 0, vk::Pipeline(), -1};
+        pipeline = info->device.createGraphicsPipeline(vk::PipelineCache(), graphicsPipelineCreateInfo);
+        return !!pipeline;
     }
-    void destroyPipeline() {
-
+    void destroyPipeline(const vk::Pipeline& pipeline) {
+        info->device.destroyPipeline(pipeline);
     }
 
     bool renderFrame(void (*externalRender)()) {
         info->device.waitForFences(1, &info->inFlightFences[info->currentFrame], VK_TRUE, std::numeric_limits<uint64_t >::max());
-        vk::ResultValue<uint32_t> resultValue = info->device.acquireNextImageKHR(info->swapchain, 0, info->imageAvailableSemaphores[info->currentFrame], vk::Fence());
+        vk::ResultValue<uint32_t> resultValue = info->device.acquireNextImageKHR(info->swapchain, std::numeric_limits<uint64_t >::max(), info->imageAvailableSemaphores[info->currentFrame], vk::Fence());
         if (resultValue.result == vk::Result::eErrorOutOfDateKHR) {
             if (reloadSwapchain()) {
                 return renderFrame(externalRender);
@@ -425,6 +428,11 @@ namespace VulkanWrapper {
             return false;
         }
         uint32_t currentIndex = resultValue.value;
+        if (info->imagesInFlight[currentIndex] != VK_NULL_HANDLE) {
+            info->device.waitForFences(1, &info->imagesInFlight[currentIndex], VK_TRUE, std::numeric_limits<uint64_t >::max());
+        }
+        info->imagesInFlight[currentIndex] = info->inFlightFences[info->currentFrame];
+
         info->device.resetCommandPool(info->commands[info->currentFrame].pool, vk::CommandPoolResetFlagBits::eReleaseResources);
 
         vk::CommandBufferBeginInfo commandBufferBeginInfo = {};
@@ -440,6 +448,7 @@ namespace VulkanWrapper {
         info->draw = false;
 
         info->commands[info->currentFrame].buffers[0].endRenderPass();
+        info->commands[info->currentFrame].buffers[0].end();
 
         vk::Semaphore waitSemaphores[] = {info->imageAvailableSemaphores[info->currentFrame]};
         vk::Semaphore signalSemaphores[] = {info->renderFinishedSemaphores[info->currentFrame]};
@@ -469,6 +478,7 @@ namespace VulkanWrapper {
     }
 
     void destroySwapchain() {
+        info->device.waitIdle();
         for (const vk::Framebuffer& framebuffer : info->swapchainFramebuffers) {
             info->device.destroyFramebuffer(framebuffer);
         }
@@ -478,6 +488,10 @@ namespace VulkanWrapper {
             info->device.destroyImageView(imageView);
         }
         info->device.destroySwapchainKHR(info->swapchain);
+    }
+
+    void waitIdle() {
+        info->device.waitIdle();
     }
 
     void terminate() {

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace ResourceManager {
+namespace resource::ResourceManager {
     void init(const std::string& folder, char separator);
     std::vector<uint8_t> readBinaryFile(const std::string& fileName, const std::vector<std::string>& folders);
 }

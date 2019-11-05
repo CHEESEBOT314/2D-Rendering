@@ -2,6 +2,7 @@
 #include "GlfwWrapper.hpp"
 #include "VulkanWrapper.hpp"
 #include "platform/Platform.hpp"
+#include "render/RenderManager.hpp"
 #include "resource/ResourceManager.hpp"
 
 int main(int argc, char** args) {
@@ -14,15 +15,21 @@ int main(int argc, char** args) {
         !VulkanWrapper::createOthers()) {
         return 0;
     }
-    ResourceManager::init(Platform::Files::getResourceFolder(), Platform::Files::FILE_SEPARATOR);
+    resource::ResourceManager::init(Platform::Files::getResourceFolder(), Platform::Files::FILE_SEPARATOR);
+    render::RenderManager::init();
+    render::RenderManager::loadShaders();
     Game::init();
 
     while (!(GlfwWrapper::shouldQuit() || Game::shouldQuit())) {
         GlfwWrapper::pollEvents();
         Game::update();
-        //VulkanWrapper::renderFrame(Game::render);
+        if (!VulkanWrapper::renderFrame(Game::render)) {
+            break;
+        }
     }
+    VulkanWrapper::waitIdle();
 
+    render::RenderManager::terminate();
     VulkanWrapper::terminate();
     GlfwWrapper::terminate();
     return 0;
