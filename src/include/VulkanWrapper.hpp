@@ -10,6 +10,10 @@ namespace VulkanWrapper {
     bool createOthers();
     bool createSwapchain();
 
+    bool createVertexBuffer(vk::Buffer& buffer, vk::DeviceMemory& memory, uint32_t size);
+    void mapVertexBuffer(const vk::DeviceMemory& memory, uint32_t size, const void* data);
+    void destroyVertexBuffer(const vk::Buffer& buffer, const vk::DeviceMemory& memory);
+
     bool createShaderModule(vk::ShaderModule& shaderModule, const std::vector<uint8_t>& src);
     void destroyShaderModule(const vk::ShaderModule& shaderModule);
 
@@ -21,6 +25,7 @@ namespace VulkanWrapper {
     bool renderFrame(void (*externalRender)());
 
     void bindPipeline(const vk::Pipeline& pipeline);
+    void bindVertexBuffers(uint32_t count, const vk::Buffer* buffers, const vk::DeviceSize* offsets);
     void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
 
     bool reloadSwapchain();

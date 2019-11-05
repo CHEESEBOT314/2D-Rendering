@@ -24,6 +24,7 @@ namespace Game {
 
     void render() {
         render::RenderManager::bindPipeline(info->shaderID);
+        render::RenderManager::drawRect2D();
     }
     void handleEvent() {
 

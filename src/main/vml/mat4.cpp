@@ -34,21 +34,21 @@ namespace vml {
         return this->cols[i];
     }
 
-    static mat4 mat4::identity() {
+    mat4 mat4::identity() {
         return mat4(
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f);
     }
-    static mat4 mat4::extend(const mat2& m) {
+    mat4 mat4::extend(const mat2& m) {
         return mat4(
             m.c0.x, m.c0.y, 0.0f, 0.0f,
             m.c1.x, m.c1.y, 0.0f, 0.0f,
             0.0f,   0.0f,   1.0f, 0.0f,
             0.0f,   0.0f,   0.0f, 1.0f);
     }
-    static mat4 mat4::extend(const mat3& m) {
+    mat4 mat4::extend(const mat3& m) {
         return mat4(
             m.c0.x, m.c0.y, m.c0.z, 0.0f,
             m.c1.x, m.c1.y, m.c1.z, 0.0f,
@@ -86,19 +86,19 @@ namespace vml {
             m0[0][3]*m1[3][0] + m0[1][3]*m1[3][1] + m0[2][3]*m1[3][2] + m0[3][3]*m1[3][3]);
     }
     mat4 operator*(const mat4& m, float s) {
-        return mat4(c0 * s, c1 * s, c2 * s, c3 * s);
+        return mat4(m.c0 * s, m.c1 * s, m.c2 * s, m.c3 * s);
     }
     mat4 operator*(float s, const mat4& m) {
-        return mat4(c0 * s, c1 * s, c2 * s, c3 * s);
+        return mat4(m.c0 * s, m.c1 * s, m.c2 * s, m.c3 * s);
     }
     vec4 operator*(const mat4& m, const vec4& v) {
         return vec4(
-            m0[0][0]*v[0] + m0[1][0]*v[1] + m0[2][0]*v[2] + m0[3][0]*v[3],
-            m0[0][1]*v[0] + m0[1][1]*v[1] + m0[2][1]*v[2] + m0[3][1]*v[3],
-            m0[0][2]*v[0] + m0[1][2]*v[1] + m0[2][2]*v[2] + m0[3][2]*v[3],
-            m0[0][3]*v[0] + m0[1][3]*v[1] + m0[2][3]*v[2] + m0[3][3]*v[3]);
+            m[0][0]*v[0] + m[1][0]*v[1] + m[2][0]*v[2] + m[3][0]*v[3],
+            m[0][1]*v[0] + m[1][1]*v[1] + m[2][1]*v[2] + m[3][1]*v[3],
+            m[0][2]*v[0] + m[1][2]*v[1] + m[2][2]*v[2] + m[3][2]*v[3],
+            m[0][3]*v[0] + m[1][3]*v[1] + m[2][3]*v[2] + m[3][3]*v[3]);
     }
     mat4 operator/(const mat4& m, float s) {
-        return mat4(c0 / s, c1 / s, c2 / s, c3 / s);
+        return mat4(m.c0 / s, m.c1 / s, m.c2 / s, m.c3 / s);
     }
 }

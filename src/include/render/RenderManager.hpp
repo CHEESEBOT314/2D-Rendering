@@ -12,10 +12,12 @@ namespace render::RenderManager {
     void bindPipeline(uint32_t id);
 
     void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
+    void drawRect2D();
 
     bool loadShaders();
     void unloadShaders();
     bool reloadShaders();
+
 
     void terminate();
 }

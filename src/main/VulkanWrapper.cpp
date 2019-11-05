@@ -19,8 +19,11 @@ namespace VulkanWrapper {
 
             vk::PhysicalDevice physicalDevice;
             vk::Device device;
+
             vk::Queue graphicsQueue;
             vk::Queue presentQueue;
+            uint32_t graphicsID;
+            uint32_t presentID;
 
             vk::SwapchainKHR swapchain;
             std::vector<vk::Image> swapchainImages;
@@ -265,6 +268,8 @@ namespace VulkanWrapper {
 
         info->graphicsQueue = info->device.getQueue(indices.graphicsFamily.value(), 0);
         info->presentQueue = info->device.getQueue(indices.presentFamily.value(), 0);
+        info->graphicsID = indices.graphicsFamily.value();
+        info->presentID = indices.presentFamily.value();
 
         ///////////////////////
         //// COMMAND POOLS ////
@@ -326,7 +331,7 @@ namespace VulkanWrapper {
                                                             queueDifferent ? vk::SharingMode::eConcurrent : vk::SharingMode::eExclusive,
                                                             queueDifferent ? 2U : 0U, queueDifferent ? queueFamilyIndices : nullptr,
                                                             swapchainSupport.capabilities.currentTransform, vk::CompositeAlphaFlagBitsKHR::eOpaque,
-                                                            presentMode, true};
+                                                            presentMode, VK_TRUE};
 
         info->swapchain = info->device.createSwapchainKHR(swapchainCreateInfo);
 
@@ -376,8 +381,43 @@ namespace VulkanWrapper {
 
             info->swapchainFramebuffers[i] = info->device.createFramebuffer(framebufferCreateInfo);
         }
-        info->imagesInFlight.resize(info->swapchainImages.size(), VK_NULL_HANDLE);
+        info->imagesInFlight.resize(info->swapchainImages.size(), vk::Fence());
         return true;
+    }
+
+    bool createVertexBuffer(vk::Buffer& buffer, vk::DeviceMemory& memory, uint32_t size) {
+        vk::BufferCreateInfo bufferCreateInfo = {vk::BufferCreateFlags(), size, vk::BufferUsageFlagBits::eVertexBuffer, vk::SharingMode::eExclusive, 1, &info->graphicsID};
+        if (!(buffer = info->device.createBuffer(bufferCreateInfo))) {
+            return false;
+        }
+        vk::MemoryRequirements memoryRequirements = info->device.getBufferMemoryRequirements(buffer);
+        vk::PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties = info->physicalDevice.getMemoryProperties();
+
+        uint32_t chosen = std::numeric_limits<uint32_t>::max();
+        for (uint32_t i = 0; i < physicalDeviceMemoryProperties.memoryTypeCount; i++) {
+            if ((memoryRequirements.memoryTypeBits & (1 << i)) && (physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & (vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent))) {
+                chosen = i;
+            }
+        }
+        if (chosen == std::numeric_limits<uint32_t>::max()) {
+            info->device.destroyBuffer(buffer);
+            return false;
+        }
+        vk::MemoryAllocateInfo memoryAllocateInfo = {size, chosen};
+        if (!(memory = info->device.allocateMemory(memoryAllocateInfo))) {
+            info->device.destroyBuffer(buffer);
+            return false;
+        }
+        return true;
+    }
+    void mapVertexBuffer(const vk::DeviceMemory& memory, uint32_t size, const void* data) {
+        void* mappedMemory = info->device.mapMemory(memory, 0, size);
+        memcpy(mappedMemory, data, size);
+        info->device.unmapMemory(memory);
+    }
+    void destroyVertexBuffer(const vk::Buffer& buffer, const vk::DeviceMemory& memory) {
+        info->device.destroyBuffer(buffer);
+        info->device.freeMemory(memory);
     }
 
     bool createShaderModule(vk::ShaderModule& shaderModule, const std::vector<uint8_t>& src) {
@@ -402,7 +442,7 @@ namespace VulkanWrapper {
         vk::Viewport viewport = {0.0f, 0.0f, (float)info->swapchainExtent.width, (float)info->swapchainExtent.height, 0.0f, 1.0f};
         vk::Rect2D scissor = {{0, 0}, info->swapchainExtent};
         vk::PipelineViewportStateCreateInfo pipelineViewportStateCreateInfo = {vk::PipelineViewportStateCreateFlags(), 1, &viewport, 1, &scissor};
-        vk::PipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo = {vk::PipelineRasterizationStateCreateFlags(), VK_FALSE, VK_FALSE, vk::PolygonMode::eFill, vk::CullModeFlagBits::eBack, vk::FrontFace::eClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f};
+        vk::PipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo = {vk::PipelineRasterizationStateCreateFlags(), VK_FALSE, VK_FALSE, vk::PolygonMode::eFill, vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f};
         vk::PipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo = {vk::PipelineMultisampleStateCreateFlags(), vk::SampleCountFlagBits::e1, VK_FALSE, 1.0f, nullptr, VK_FALSE, VK_FALSE};
         vk::PipelineColorBlendAttachmentState pipelineColorBlendAttachmentState = {VK_TRUE, vk::BlendFactor::eSrcAlpha, vk::BlendFactor::eOneMinusSrcAlpha, vk::BlendOp::eAdd, vk::BlendFactor::eOne, vk::BlendFactor::eZero, vk::BlendOp::eAdd, vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA};
         vk::PipelineColorBlendStateCreateInfo pipelineColorBlendStateCreateInfo = {vk::PipelineColorBlendStateCreateFlags(), VK_FALSE, vk::LogicOp::eCopy, 1, &pipelineColorBlendAttachmentState, {0.0f, 0.0f, 0.0f, 0.0f}};
@@ -428,7 +468,7 @@ namespace VulkanWrapper {
             return false;
         }
         uint32_t currentIndex = resultValue.value;
-        if (info->imagesInFlight[currentIndex] != VK_NULL_HANDLE) {
+        if (info->imagesInFlight[currentIndex] != vk::Fence()) {
             info->device.waitForFences(1, &info->imagesInFlight[currentIndex], VK_TRUE, std::numeric_limits<uint64_t >::max());
         }
         info->imagesInFlight[currentIndex] = info->inFlightFences[info->currentFrame];
@@ -468,7 +508,12 @@ namespace VulkanWrapper {
         if (!info->draw) return;
         info->commands[info->currentFrame].buffers[0].bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline);
     }
+    void bindVertexBuffers(uint32_t count, const vk::Buffer* buffers, const vk::DeviceSize* offsets) {
+        if (!info->draw) return;
+        info->commands[info->currentFrame].buffers[0].bindVertexBuffers(0, count, buffers, offsets);
+    }
     void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) {
+        if (!info->draw) return;
         info->commands[info->currentFrame].buffers[0].draw(vertexCount, instanceCount, firstVertex, firstInstance);
     }
 

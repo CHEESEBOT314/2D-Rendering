@@ -31,7 +31,7 @@ namespace vml
         return this->data[i];
     }
 
-    float vec2::magnitude() {
+    float vec2::magnitude() const {
         return sqrt(x*x + y*y);
     }
 

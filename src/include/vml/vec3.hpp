@@ -24,7 +24,7 @@ namespace vml {
         float& operator[](int i);
         float const& operator[](int i) const;
 
-        float magnitude();
+        float magnitude() const;
     };
 
     vec3 operator+(const vec3& v);

@@ -13,11 +13,23 @@ namespace render::RenderManager {
                 vk::Pipeline pl;
             };
 
+            const std::vector<Vertex> vertices2D = {
+                    {{-0.5f, -0.5f}, {-0.5f, -0.5f}},
+                    {{0.5f, -0.5f}, {0.5f, -0.5f}},
+                    {{0.5f, 0.5f}, {0.5f, 0.5f}},
+                    {{-0.5f, -0.5f}, {-0.5f, -0.5f}},
+                    {{0.5f, 0.5f}, {0.5f, 0.5f}},
+                    {{-0.5f, 0.5f}, {-0.5f, 0.5f}}};
+
             struct Info {
                 std::map<std::string, uint32_t> nameToIdMap;
                 std::map<uint32_t, Pipeline> idToPipelineMap;
                 uint32_t nextId = 1;
                 bool loaded = false;
+
+                vk::Buffer rect2D;
+                vk::DeviceMemory rect2DMemory;
+                vk::DeviceSize* offsets;
             };
             std::unique_ptr<Info> info;
 
@@ -73,18 +85,21 @@ namespace render::RenderManager {
 
         void init() {
             info = std::make_unique<Info>();
+            VulkanWrapper::createVertexBuffer(info->rect2D, info->rect2DMemory, sizeof(Vertex) * vertices2D.size());
+            VulkanWrapper::mapVertexBuffer(info->rect2DMemory, sizeof(Vertex) * vertices2D.size(), vertices2D.data());
+            info->offsets = new vk::DeviceSize[1]{0};
         }
 
         bool createGraphicsPipeline(const std::string &name) {
             info->nameToIdMap.insert(std::pair<const std::string, uint32_t>(name, info->nextId));
-            info->nextId++;
             if (info->loaded) {
                 Pipeline pipeline;
                 if (!loadPipeline(name, pipeline)) {
                     return false;
                 }
-                info->idToPipelineMap.insert(std::pair<const uint32_t, Pipeline>(info->nextId - 1, pipeline));
+                info->idToPipelineMap.insert(std::pair<const uint32_t, Pipeline>(info->nextId, pipeline));
             }
+            info->nextId++;
             return true;
         }
 
@@ -107,6 +122,10 @@ namespace render::RenderManager {
 
         void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) {
             VulkanWrapper::draw(vertexCount, instanceCount, firstVertex, firstInstance);
+        }
+        void drawRect2D() {
+            VulkanWrapper::bindVertexBuffers(1, &info->rect2D, info->offsets);
+            draw(3, 1, 0, 0);
         }
 
         bool loadShaders() {
@@ -139,6 +158,8 @@ namespace render::RenderManager {
             if (info->loaded) {
                 unloadShaders();
             }
+            delete[] info->offsets;
+            VulkanWrapper::destroyVertexBuffer(info->rect2D, info->rect2DMemory);
             info->nameToIdMap.clear();
             info.reset(nullptr);
         }

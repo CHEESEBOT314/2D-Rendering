@@ -32,13 +32,13 @@ namespace vml {
         return this->cols[i];
     }
 
-    static mat3 mat3::identity() {
+    mat3 mat3::identity() {
         return mat3(
             1.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 1.0f);
     }
-    static mat3 mat3::extend(const mat2& m) {
+    mat3 mat3::extend(const mat2& m) {
         return mat3(
             m.c0.x, m.c0.y, 0.0f,
             m.c1.x, m.c1.y, 0.0f,
@@ -74,9 +74,9 @@ namespace vml {
     }
     vec3 operator*(const mat3& m, const vec3& v) {
         return vec3(
-            m[0][0]*v[0] + m0[1][0]*v[1] + m0[2][0]*v[2],
-            m[0][1]*v[0] + m0[1][1]*v[1] + m0[2][1]*v[2],
-            m[0][2]*v[0] + m0[1][2]*v[1] + m0[2][2]*v[2]);
+            m[0][0]*v[0] + m[1][0]*v[1] + m[2][0]*v[2],
+            m[0][1]*v[0] + m[1][1]*v[1] + m[2][1]*v[2],
+            m[0][2]*v[0] + m[1][2]*v[1] + m[2][2]*v[2]);
     }
     mat3 operator/(const mat3& m, float s) {
         return mat3(m.c0 / s, m.c1 / s, m.c2 / s);

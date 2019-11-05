@@ -43,7 +43,7 @@ namespace vml {
         return out;
     }
     mat4 perspectiveM4(float aspectRatio, float fovPiRad, float near, float far) {
-        float s = 1.0f / tan(0.5f * M_PI * fovPiRad);
+        float s = 1.0f / (float)tan(0.5f * M_PI * fovPiRad);
         mat4 out;
         out[0][0] = s;
         out[1][1] = -s * aspectRatio;

@@ -31,7 +31,7 @@ namespace vml {
         return this->cols[i];
     }
 
-    static mat2 mat2::identity() {
+    mat2 mat2::identity() {
         return mat2(1.0f, 0.0f, 0.0f, 1.0f);
     }
 

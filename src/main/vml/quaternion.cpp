@@ -29,15 +29,15 @@ namespace vml {
         return this->data[i];
     }
 
-    static quaternion identity() {
+    quaternion quaternion::identity() {
         return quaternion(1.0f, 0.0f, 0.0f, 0.0f);
     }
-    quaternion inverse() {
-        return quaternion(q.x, -q.y, -q.z, -q.w);
+    quaternion quaternion::inverse() {
+        return quaternion(x, -y, -z, -w);
     }
-    vec4 rotate(const vec4& v) {
-        quaternion temp = *this * quaternion(0.0f, v.x, v.y, v.z) * this->inverse();
-        return vec4(temp.y, temp.z, temp.w, v.w);
+    vec4 quaternion::rotate(const vec4& v) {
+        quaternion temp = *this * quaternion(0.0f, v.y, v.z, v.x) * this->inverse();
+        return vec4(temp.w, temp.y, temp.z, v.w);
     }
 
     quaternion operator+(const quaternion& q) {
