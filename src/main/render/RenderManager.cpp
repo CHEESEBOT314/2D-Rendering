@@ -13,14 +13,6 @@ namespace render::RenderManager {
                 vk::Pipeline pl;
             };
 
-            const std::vector<Vertex> vertices2D = {
-                    {{-0.5f, -0.5f}, {-0.5f, -0.5f}},
-                    {{0.5f, -0.5f}, {0.5f, -0.5f}},
-                    {{0.5f, 0.5f}, {0.5f, 0.5f}},
-                    {{-0.5f, -0.5f}, {-0.5f, -0.5f}},
-                    {{0.5f, 0.5f}, {0.5f, 0.5f}},
-                    {{-0.5f, 0.5f}, {-0.5f, 0.5f}}};
-
             struct Info {
                 std::map<std::string, uint32_t> nameToIdMap;
                 std::map<uint32_t, Pipeline> idToPipelineMap;
@@ -29,7 +21,7 @@ namespace render::RenderManager {
 
                 vk::Buffer rect2D;
                 vk::DeviceMemory rect2DMemory;
-                vk::DeviceSize* offsets;
+                vk::DeviceSize* offsets = nullptr;
             };
             std::unique_ptr<Info> info;
 
@@ -68,7 +60,7 @@ namespace render::RenderManager {
                 vertexInputAttributeDescriptions[0] = {0, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, pos)};
                 vertexInputAttributeDescriptions[1] = {1, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, uv)};
 
-                if (!VulkanWrapper::createPipeline(pipeline.pl, pipeline.layout, 2, shaderStageCreateInfos, 1, &vertexInputBindingDescription, 2, vertexInputAttributeDescriptions)) {
+                if (!VulkanWrapper::createPipeline(pipeline.pl, pipeline.layout, 2, shaderStageCreateInfos, 1, &vertexInputBindingDescription, 2, vertexInputAttributeDescriptions, 1.0f)) {
                     VulkanWrapper::destroyShaderModule(vert);
                     VulkanWrapper::destroyShaderModule(frag);
                     VulkanWrapper::destroyPipelineLayout(pipeline.layout);
@@ -85,6 +77,13 @@ namespace render::RenderManager {
 
         void init() {
             info = std::make_unique<Info>();
+            static const std::vector<Vertex> vertices2D = {
+                    {{0.0f, 0.0f}, {0.0f, 0.0f}},
+                    {{1.0f, 0.0f}, {1.0f, 0.0f}},
+                    {{1.0f, 1.0f}, {1.0f, 1.0f}},
+                    {{0.0f, 0.0f}, {0.0f, 0.0f}},
+                    {{1.0f, 1.0f}, {1.0f, 1.0f}},
+                    {{0.0f, 1.0f}, {0.0f, 1.0f}}};
             VulkanWrapper::createVertexBuffer(info->rect2D, info->rect2DMemory, sizeof(Vertex) * vertices2D.size());
             VulkanWrapper::mapVertexBuffer(info->rect2DMemory, sizeof(Vertex) * vertices2D.size(), vertices2D.data());
             info->offsets = new vk::DeviceSize[1]{0};
@@ -125,7 +124,7 @@ namespace render::RenderManager {
         }
         void drawRect2D() {
             VulkanWrapper::bindVertexBuffers(1, &info->rect2D, info->offsets);
-            draw(3, 1, 0, 0);
+            draw(6, 1, 0, 0);
         }
 
         bool loadShaders() {

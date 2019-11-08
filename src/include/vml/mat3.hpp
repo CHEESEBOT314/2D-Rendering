@@ -6,10 +6,7 @@
 
 namespace vml {
     struct mat3 {
-        union {
-            vec3 cols[3];
-            struct { vec3 c0, c1, c2; };
-        };
+        vec3 cols[3];
         mat3();
         mat3(float c00, float c01, float c02,
              float c10, float c11, float c12,

@@ -1,16 +1,16 @@
 #include "vml/mat2.hpp"
 
 namespace vml {
-    mat2::mat2() : c0(), c1() {}
+    mat2::mat2() : cols{vec2(), vec2()} {};
     mat2::mat2(float c00, float c01,
                float c10, float c11)
-                : c0(c00, c01), c1(c10, c11) {}
-    mat2::mat2(const vec2& c0, const vec2& c1) : c0(c0), c1(c1) {}
-    mat2::mat2(const mat2& m) : c0(m.c0), c1(m.c1) {}
+                : cols{vec2(c00, c01), vec2(c10, c11)} {}
+    mat2::mat2(const vec2& c0, const vec2& c1) : cols{c0, c1} {}
+    mat2::mat2(const mat2& m) : cols{m[0], m[1]} {}
 
     mat2& mat2::operator=(const mat2& m) {
-        this->c0 = m.c0;
-        this->c1 = m.c1;
+        this->cols[0] = m[0];
+        this->cols[1] = m[1];
         return *this;
     }
     mat2& mat2::operator*=(const mat2& m) {
@@ -36,10 +36,10 @@ namespace vml {
     }
 
     mat2 operator+(const mat2& m) {
-        return mat2(+m.c0, +m.c1);
+        return mat2(+m[0], +m[1]);
     }
     mat2 operator-(const mat2& m) {
-        return mat2(-m.c0, -m.c1);
+        return mat2(-m[0], -m[1]);
     }
 
     mat2 operator*(const mat2& m0, const mat2& m1) {
@@ -48,10 +48,10 @@ namespace vml {
             m0[0][0]*m1[1][0] + m0[1][0]*m1[1][1], m0[0][1]*m1[1][0] + m0[1][1]*m1[1][1]);
     }
     mat2 operator*(const mat2& m, float s) {
-        return mat2(m.c0 * s, m.c1 * s);
+        return mat2(m[0] * s, m[1] * s);
     }
     mat2 operator*(float s, const mat2& m) {
-        return mat2(m.c0 * s, m.c1 * s);
+        return mat2(m[0] * s, m[1] * s);
     }
     vec2 operator*(const mat2& m, const vec2& v) {
         return vec2(
@@ -59,6 +59,6 @@ namespace vml {
             m[0][1]*v[0] + m[1][1]*v[1]);
     }
     mat2 operator/(const mat2& m, float s) {
-        return mat2(m.c0 / s, m.c1 / s);
+        return mat2(m[0] / s, m[1] / s);
     }
 }

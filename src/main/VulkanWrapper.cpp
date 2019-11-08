@@ -395,7 +395,7 @@ namespace VulkanWrapper {
 
         uint32_t chosen = std::numeric_limits<uint32_t>::max();
         for (uint32_t i = 0; i < physicalDeviceMemoryProperties.memoryTypeCount; i++) {
-            if ((memoryRequirements.memoryTypeBits & (1 << i)) && (physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & (vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent))) {
+            if ((memoryRequirements.memoryTypeBits & (1u << i)) && (physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & (vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent))) {
                 chosen = i;
             }
         }
@@ -403,11 +403,12 @@ namespace VulkanWrapper {
             info->device.destroyBuffer(buffer);
             return false;
         }
-        vk::MemoryAllocateInfo memoryAllocateInfo = {size, chosen};
+        vk::MemoryAllocateInfo memoryAllocateInfo = {memoryRequirements.size, chosen};
         if (!(memory = info->device.allocateMemory(memoryAllocateInfo))) {
             info->device.destroyBuffer(buffer);
             return false;
         }
+        info->device.bindBufferMemory(buffer, memory, 0);
         return true;
     }
     void mapVertexBuffer(const vk::DeviceMemory& memory, uint32_t size, const void* data) {
@@ -436,10 +437,25 @@ namespace VulkanWrapper {
     void destroyPipelineLayout(const vk::PipelineLayout& pipelineLayout) {
         info->device.destroyPipelineLayout(pipelineLayout);
     }
-    bool createPipeline(vk::Pipeline& pipeline, const vk::PipelineLayout& pipelineLayout, uint32_t shaderModuleCount, const vk::PipelineShaderStageCreateInfo* shaderModules, uint32_t vertexBindingDescriptionCount, const vk::VertexInputBindingDescription* vertexBindingDescriptions, uint32_t vertexAttributeDescriptionCount, const vk::VertexInputAttributeDescription* vertexAttributeDescriptions) {
+    bool createPipeline(vk::Pipeline& pipeline, const vk::PipelineLayout& pipelineLayout, uint32_t shaderModuleCount, const vk::PipelineShaderStageCreateInfo* shaderModules, uint32_t vertexBindingDescriptionCount, const vk::VertexInputBindingDescription* vertexBindingDescriptions, uint32_t vertexAttributeDescriptionCount, const vk::VertexInputAttributeDescription* vertexAttributeDescriptions, float targetAspect) {
         vk::PipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo = {vk::PipelineVertexInputStateCreateFlags(), vertexBindingDescriptionCount, vertexBindingDescriptions, vertexAttributeDescriptionCount, vertexAttributeDescriptions};
         vk::PipelineInputAssemblyStateCreateInfo pipelineAssemblyStateCreateInfo = {vk::PipelineInputAssemblyStateCreateFlags(), vk::PrimitiveTopology::eTriangleList, VK_FALSE};
-        vk::Viewport viewport = {0.0f, 0.0f, (float)info->swapchainExtent.width, (float)info->swapchainExtent.height, 0.0f, 1.0f};
+
+        float width = info->swapchainExtent.width;
+        float height = info->swapchainExtent.height;
+        vk::Viewport viewport = {0.0f, 0.0f, width, height, 0.0f, 1.0f};
+
+        float swapchainAspect = width / height;
+        if (swapchainAspect > targetAspect) {
+            float targetW = width * targetAspect / swapchainAspect;
+            viewport.x = (width - targetW) / 2.0f;
+            viewport.width = targetW;
+        }
+        else {
+            float targetH = height * swapchainAspect / targetAspect;
+            viewport.y = (height - targetH) / 2.0f;
+            viewport.height = targetH;
+        }
         vk::Rect2D scissor = {{0, 0}, info->swapchainExtent};
         vk::PipelineViewportStateCreateInfo pipelineViewportStateCreateInfo = {vk::PipelineViewportStateCreateFlags(), 1, &viewport, 1, &scissor};
         vk::PipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo = {vk::PipelineRasterizationStateCreateFlags(), VK_FALSE, VK_FALSE, vk::PolygonMode::eFill, vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f};

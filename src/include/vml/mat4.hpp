@@ -6,10 +6,7 @@
 
 namespace vml {
     struct mat4 {
-        union {
-            vec4 cols[4];
-            struct { vec4 c0, c1, c2, c3; };
-        };
+        vec4 cols[4];
         mat4();
         mat4(float c00, float c01, float c02, float c03,
              float c10, float c11, float c12, float c13,

@@ -5,6 +5,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
+
+
                 ### GLFW SETUP ###
 ###============================================###
 set(GLFW_BUILD_EXAMPLES   OFF CACHE BOOL "" FORCE)
@@ -30,6 +32,7 @@ set(SOURCES src/main/Main.cpp
         src/main/VulkanWrapper.cpp
 
         src/main/render/RenderManager.cpp
+        src/main/render/SpriteManager.cpp
 
         src/main/resource/ResourceManager.cpp
 

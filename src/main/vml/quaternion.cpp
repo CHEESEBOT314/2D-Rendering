@@ -1,15 +1,15 @@
 #include "vml/quaternion.hpp"
 
 namespace vml {
-    quaternion::quaternion() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
-    quaternion::quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
-    quaternion::quaternion(const quaternion& q) : x(q.x), y(q.y), z(q.z), w(q.w) {}
+    quaternion::quaternion() : data{0.0f, 0.0f, 0.0f, 0.0f} {}
+    quaternion::quaternion(float x, float y, float z, float w) : data{x, y, z, w} {}
+    quaternion::quaternion(const quaternion& q) : data{q[0], q[1], q[2], q[3]} {}
 
     quaternion& quaternion::operator=(const quaternion& q) {
-        this->x = q.x;
-        this->y = q.y;
-        this->z = q.z;
-        this->w = q.w;
+        this->data[0] = q[0];
+        this->data[1] = q[1];
+        this->data[2] = q[2];
+        this->data[3] = q[3];
         return *this;
     }
     quaternion& quaternion::operator*=(const quaternion& q) {
@@ -33,34 +33,34 @@ namespace vml {
         return quaternion(1.0f, 0.0f, 0.0f, 0.0f);
     }
     quaternion quaternion::inverse() {
-        return quaternion(x, -y, -z, -w);
+        return quaternion(this->data[0], -this->data[1], -this->data[2], -this->data[3]);
     }
     vec4 quaternion::rotate(const vec4& v) {
-        quaternion temp = *this * quaternion(0.0f, v.y, v.z, v.x) * this->inverse();
-        return vec4(temp.w, temp.y, temp.z, v.w);
+        quaternion temp = *this * quaternion(0.0f, v[0], v[1], v[2]) * this->inverse();
+        return vec4(temp[1], temp[2], temp[3], v[3]);
     }
 
     quaternion operator+(const quaternion& q) {
-        return quaternion(+q.x, +q.y, +q.z, +q.w);
+        return quaternion(+q[0], +q[1], +q[2], +q[3]);
     }
     quaternion operator-(const quaternion& q) {
-        return quaternion(-q.x, -q.y, -q.z, -q.w);
+        return quaternion(-q[0], -q[1], -q[2], -q[3]);
     }
 
     quaternion operator*(const quaternion& q1, const quaternion& q2) {
         return quaternion(
-            q1.x*q2.x - q1.y*q2.y - q1.z*q2.z - q1.w*q2.w,
-            q1.x*q2.y + q1.y*q2.x + q1.z*q2.w - q1.w*q2.z,
-            q1.x*q2.z - q1.y*q2.w + q1.z*q2.x + q1.w*q2.y,
-            q1.x*q2.w + q1.y*q2.w - q1.y*q2.y + q1.w*q2.x);
+            q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3],
+            q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2],
+            q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1],
+            q1[0]*q2[3] + q1[1]*q2[3] - q1[1]*q2[1] + q1[3]*q2[0]);
     }
     quaternion operator*(const quaternion& q, float s) {
-        return quaternion(q.x * s, q.y * s, q.z * s, q.w * s);
+        return quaternion(q[0] * s, q[1] * s, q[2] * s, q[3] * s);
     }
     quaternion operator*(float s, const quaternion& q) {
-        return quaternion(q.x * s, q.y * s, q.z * s, q.w * s);
+        return quaternion(q[0] * s, q[1] * s, q[2] * s, q[3] * s);
     }
     quaternion operator/(const quaternion& q, float s) {
-        return quaternion(q.x / s, q.y / s, q.z / s, q.w / s);
+        return quaternion(q[0] / s, q[1] / s, q[2] / s, q[3] / s);
     }
 }

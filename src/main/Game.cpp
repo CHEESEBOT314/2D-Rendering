@@ -34,7 +34,7 @@ namespace Game {
     }
 
     bool shouldQuit() {
-        return info->counter > 99;
+        return info->counter > 999;
     }
 
     void terminate() {

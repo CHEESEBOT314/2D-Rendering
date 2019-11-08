@@ -5,10 +5,7 @@
 
 namespace vml {
     struct quaternion {
-        union {
-            float data[4];
-            struct { float x, y, z, w; };
-        };
+        float data[4];
 
         quaternion();
         quaternion(float x, float y, float z, float w);

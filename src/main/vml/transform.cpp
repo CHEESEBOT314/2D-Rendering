@@ -1,27 +1,28 @@
 #include "vml/transform.hpp"
 
+#define M_PI 3.1415926535897932384f
 #include <cmath>
 
 namespace vml {
     mat3 scaleM3(float s) {
         return mat3(
-            s,    0.0f, 0.0f,
-            0.0f, s,    0.0f,
-            0.0f, 0.0f, s   );
+                 s,    0.0f, 0.0f,
+            0.0f,      s,    0.0f,
+            0.0f, 0.0f,      s   );
     }
     mat3 scaleM3(const vec3& v) {
         return mat3(
-            v.x,  0.0f, 0.0f,
-            0.0f, v.y,  0.0f,
-            0.0f, 0.0f, v.z );
+            v[0], 0.0f, 0.0f,
+            0.0f, v[1], 0.0f,
+            0.0f, 0.0f, v[2]);
     }
 
     mat4 translateM4(const vec3& v) {
         return mat4(
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            v.x,  v.y,  v.z,  1.0f);
+            1.0f,  0.0f,  0.0f,  0.0f,
+            0.0f,  1.0f,  0.0f,  0.0f,
+            0.0f,  0.0f,  1.0f,  0.0f,
+            v[0],  v[1],  v[2],  1.0f);
     }
     mat4 translateM4(const mat3& m, const vec3& v) {
         mat4 out = mat4::extend(m);
@@ -43,7 +44,7 @@ namespace vml {
         return out;
     }
     mat4 perspectiveM4(float aspectRatio, float fovPiRad, float near, float far) {
-        float s = 1.0f / (float)tan(0.5f * M_PI * fovPiRad);
+        float s = 1.0f / std::tan(0.5f * M_PI * fovPiRad);
         mat4 out;
         out[0][0] = s;
         out[1][1] = -s * aspectRatio;
@@ -55,7 +56,7 @@ namespace vml {
 
     quaternion rotateQ(float rad, const vec3& axis) {
         vec3 unit = axis / axis.magnitude();
-        float s = sin(rad / 2);
-        return quaternion(cos(rad / 2), s + unit.x, s * unit.y, s * unit. z);
+        float s = std::sin(rad / 2);
+        return quaternion(std::cos(rad / 2), s + unit[0], s * unit[1], s * unit[2]);
     }
 }

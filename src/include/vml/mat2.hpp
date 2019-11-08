@@ -5,10 +5,7 @@
 
 namespace vml {
     struct mat2 {
-        union {
-            vec2 cols[2];
-            struct { vec2 c0, c1; };
-        };
+        vec2 cols[2];
         mat2();
         mat2(float c00, float c01,
              float c10, float c11);
