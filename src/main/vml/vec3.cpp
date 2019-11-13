@@ -1,5 +1,7 @@
 #include "vml/vec3.hpp"
 
+#include <cmath>
+
 namespace vml
 {
     vec3::vec3() : data{0.0f, 0.0f, 0.0f} {}

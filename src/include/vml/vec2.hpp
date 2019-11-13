@@ -1,8 +1,6 @@
 #ifndef MSCFINALPROJECT_VML_VEC2_HPP
 #define MSCFINALPROJECT_VML_VEC2_HPP
 
-#include <cmath>
-
 namespace vml {
     struct vec2 {
         float data[2];

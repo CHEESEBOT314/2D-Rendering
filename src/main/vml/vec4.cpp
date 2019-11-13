@@ -1,5 +1,7 @@
 #include "vml/vec4.hpp"
 
+#include <cmath>
+
 namespace vml
 {
     vec4::vec4() : data{0.0f, 0.0f, 0.0f, 0.0f} {}
