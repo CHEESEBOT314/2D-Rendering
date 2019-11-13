@@ -3,6 +3,7 @@
 #include "render/RenderManager.hpp"
 
 #include <memory>
+#include <vml/transform.hpp>
 
 namespace Game {
     namespace {
@@ -24,6 +25,7 @@ namespace Game {
 
     void render() {
         render::RenderManager::bindPipeline(info->shaderID);
+        render::RenderManager::setModel(vml::rotateM4(vml::rotateQ((float)info->counter  / 1000.0f, vml::vec3(0.0f, 0.0f, 1.0f))));
         render::RenderManager::drawRect2D();
     }
     void handleEvent() {
@@ -34,7 +36,7 @@ namespace Game {
     }
 
     bool shouldQuit() {
-        return info->counter > 999;
+        return false;
     }
 
     void terminate() {

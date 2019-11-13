@@ -9,10 +9,20 @@ namespace GlfwWrapper {
             GLFWwindow *window;
         };
         std::unique_ptr<Info> info;
+
+        void errorCallback(int error, const char* description) {
+            printf("GLFW error %d: %s\n", error, description);
+        }
+        void keyCallback(GLFWwindow* w, int key, int scancode, int action, int mods) {
+            if (key == GLFW_KEY_ESCAPE) {
+                glfwSetWindowShouldClose(w, true);
+            }
+        }
     }
     std::vector<const char*> init() {
         std::vector<const char*> extensions;
         if (!info) {
+            glfwSetErrorCallback(errorCallback);
             if (glfwInit() && glfwVulkanSupported()) {
                 uint32_t extCount;
                 const char **extList = glfwGetRequiredInstanceExtensions(&extCount);
@@ -27,6 +37,8 @@ namespace GlfwWrapper {
                 if (w) {
                     info = std::make_unique<Info>();
                     info->window = w;
+                    glfwSetKeyCallback(w, keyCallback);
+
                     return extensions;
                 }
             }

@@ -15,7 +15,7 @@ set(GLFW_INSTALL          OFF CACHE BOOL "" FORCE)
 add_subdirectory(glfw)
 ###============================================###
 
-set(ENV{VULKAN_SDK} "/Users/eddie/vulkansdk-macos-1.1.121.1/macOS")
+#set(ENV{VULKAN_SDK} "/Users/eddie/vulkansdk-macos-1.1.121.1/macOS")
 
 find_package(Vulkan REQUIRED)
 

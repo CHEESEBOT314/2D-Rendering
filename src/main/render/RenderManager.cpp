@@ -1,6 +1,7 @@
 #include "render/RenderManager.hpp"
 
 #include "VulkanWrapper.hpp"
+#include "render/PushConstants.hpp"
 #include "render/Vertex.hpp"
 #include "resource/ResourceManager.hpp"
 
@@ -22,6 +23,9 @@ namespace render::RenderManager {
                 vk::Buffer rect2D;
                 vk::DeviceMemory rect2DMemory;
                 vk::DeviceSize* offsets = nullptr;
+
+                PushConstants currentPC;
+                Pipeline* currentPL = nullptr;
             };
             std::unique_ptr<Info> info;
 
@@ -43,11 +47,15 @@ namespace render::RenderManager {
                                                                               vk::ShaderStageFlagBits::eFragment, frag,
                                                                               "main");
 
+                vk::PushConstantRange pushConstantRange = {vk::ShaderStageFlagBits::eVertex,
+                                                           0,
+                                                           sizeof(PushConstants)};
+
                 vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {vk::PipelineLayoutCreateFlags(),
                                                                          0,
                                                                          nullptr,
-                                                                         0,
-                                                                         nullptr};
+                                                                         1,
+                                                                         &pushConstantRange};
                 if (!VulkanWrapper::createPipelineLayout(pipeline.layout, pipelineLayoutCreateInfo)) {
                     VulkanWrapper::destroyShaderModule(vert);
                     VulkanWrapper::destroyShaderModule(frag);
@@ -87,6 +95,7 @@ namespace render::RenderManager {
             VulkanWrapper::createVertexBuffer(info->rect2D, info->rect2DMemory, sizeof(Vertex) * vertices2D.size());
             VulkanWrapper::mapVertexBuffer(info->rect2DMemory, sizeof(Vertex) * vertices2D.size(), vertices2D.data());
             info->offsets = new vk::DeviceSize[1]{0};
+            resetPushConstants();
         }
 
         bool createGraphicsPipeline(const std::string &name) {
@@ -115,11 +124,34 @@ namespace render::RenderManager {
                 auto it = info->idToPipelineMap.find(id);
                 if (it != info->idToPipelineMap.end()) {
                     VulkanWrapper::bindPipeline(it->second.pl);
+                    info->currentPL = &it->second;
                 }
             }
         }
 
+        void resetPushConstants() {
+            info->currentPC.p = vml::mat4::identity();
+            info->currentPC.v = vml::mat4::identity();
+            info->currentPC.m = vml::mat4::identity();
+            info->currentPC.textureTransform = vml::mat3(1.0f, 0.0f, 0.0,
+                                                       0.0f, 1.0f, 0.0f,
+                                                       0.0f, 0.0f, 0.0f);
+        }
+        void setPerspective(const vml::mat4& pers) {
+            info->currentPC.p = pers;
+        }
+        void setView(const vml::mat4& view) {
+            info->currentPC.v = view;
+        }
+        void setModel(const vml::mat4& mode) {
+            info->currentPC.m = mode;
+        }
+        void setTextureTransform(const vml::mat3& tt) {
+            info->currentPC.textureTransform = tt;
+        }
+
         void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) {
+            VulkanWrapper::pushConstants(info->currentPL->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(PushConstants), &info->currentPC);
             VulkanWrapper::draw(vertexCount, instanceCount, firstVertex, firstInstance);
         }
         void drawRect2D() {

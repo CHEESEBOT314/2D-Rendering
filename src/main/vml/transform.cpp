@@ -32,6 +32,34 @@ namespace vml {
         return out;
     }
 
+    mat4 rotateXM4(float rad) {
+        float c = std::cos(rad);
+        float s = std::sin(rad);
+        return mat4(
+                1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, c, s, 0.0f,
+                0.0f, -s, c, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+    }
+    mat4 rotateYM4(float rad) {
+        float c = std::cos(rad);
+        float s = std::sin(rad);
+        return mat4(
+                c, 0.0f, -s, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f,
+                s, 0.0f, c, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
+    }
+    mat4 rotateZM4(float rad) {
+        float c = std::cos(rad);
+        float s = std::sin(rad);
+        return mat4(
+            c, s, 0.0f, 0.0f,
+            -s, c, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f);
+    }
+
     mat4 orthoM4(float left, float right, float bottom, float top, float near, float far) {
         mat4 out;
         out[0][0] = 2.0f / (right - left);
@@ -57,6 +85,13 @@ namespace vml {
     quaternion rotateQ(float rad, const vec3& axis) {
         vec3 unit = axis / axis.magnitude();
         float s = std::sin(rad / 2);
-        return quaternion(std::cos(rad / 2), s + unit[0], s * unit[1], s * unit[2]);
+        return quaternion(std::cos(rad / 2), s * unit[0], s * unit[1], s * unit[2]);
+    }
+    mat4 rotateM4(const quaternion& q) {
+        return mat4(
+                1.0f-2.0f*(q[2]*q[2]+q[3]*q[3]), 2.0f*(q[1]*q[2]+q[3]*q[0]),      2.0f*(q[1]*q[3]-q[2]*q[0]),      0.0f,
+                2.0f*(q[1]*q[2]-q[3]*q[0]),      1.0f-2.0f*(q[1]*q[1]+q[3]*q[3]), 2.0f*(q[2]*q[3]+q[1]*q[0]),      0.0f,
+                2.0f*(q[1]*q[3]+q[2]*q[0]),      2.0f*(q[2]*q[3]-q[1]*q[0]),      1.0f-2.0f*(q[1]*q[1]+q[2]*q[2]), 0.0f,
+                0.0f,                            0.0f,                            0.0f,                            1.0f);
     }
 }

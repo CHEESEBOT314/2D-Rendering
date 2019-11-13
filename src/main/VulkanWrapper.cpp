@@ -51,7 +51,7 @@ namespace VulkanWrapper {
 
 #ifdef DEBUG_MODE
         VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-            printf("%s", pCallbackData->pMessage);
+            printf("%s\n", pCallbackData->pMessage);
             return VK_FALSE;
         }
         vk::Result createDebugUtilsMessengerEXT() {
@@ -527,6 +527,10 @@ namespace VulkanWrapper {
     void bindVertexBuffers(uint32_t count, const vk::Buffer* buffers, const vk::DeviceSize* offsets) {
         if (!info->draw) return;
         info->commands[info->currentFrame].buffers[0].bindVertexBuffers(0, count, buffers, offsets);
+    }
+    void pushConstants(const vk::PipelineLayout& layout, const vk::ShaderStageFlags& stage, uint32_t offset, uint32_t size, const void* ptr) {
+        if (!info->draw) return;
+        info->commands[info->currentFrame].buffers[0].pushConstants(layout, stage, offset, size, ptr);
     }
     void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) {
         if (!info->draw) return;

@@ -26,6 +26,7 @@ namespace VulkanWrapper {
 
     void bindPipeline(const vk::Pipeline& pipeline);
     void bindVertexBuffers(uint32_t count, const vk::Buffer* buffers, const vk::DeviceSize* offsets);
+    void pushConstants(const vk::PipelineLayout& layout, const vk::ShaderStageFlags& stage, uint32_t offset, uint32_t size, const void* ptr);
     void draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
 
     bool reloadSwapchain();
