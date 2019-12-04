@@ -3,6 +3,7 @@
 #include "VulkanWrapper.hpp"
 #include "platform/Platform.hpp"
 #include "render/RenderManager.hpp"
+#include "render/SpriteManager.hpp"
 #include "resource/ResourceManager.hpp"
 
 int main(int argc, char** args) {
@@ -16,8 +17,12 @@ int main(int argc, char** args) {
         return 0;
     }
     resource::ResourceManager::init(Platform::Files::getResourceFolder(), Platform::Files::FILE_SEPARATOR);
+
     render::RenderManager::init();
     render::RenderManager::loadShaders();
+
+    render::SpriteManager::init();
+
     Game::init();
 
     while (!(GlfwWrapper::shouldQuit() || Game::shouldQuit())) {

@@ -65,8 +65,8 @@ namespace render::RenderManager {
                                                                                    sizeof(Vertex),
                                                                                    vk::VertexInputRate::eVertex};
                 vk::VertexInputAttributeDescription vertexInputAttributeDescriptions[2];
-                vertexInputAttributeDescriptions[0] = {0, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, pos)};
-                vertexInputAttributeDescriptions[1] = {1, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, uv)};
+                vertexInputAttributeDescriptions[0] = {0, 0, vk::Format::eR32G32Sfloat, (uint32_t)offsetof(Vertex, pos)};
+                vertexInputAttributeDescriptions[1] = {1, 0, vk::Format::eR32G32Sfloat, (uint32_t)offsetof(Vertex, uv)};
 
                 if (!VulkanWrapper::createPipeline(pipeline.pl, pipeline.layout, 2, shaderStageCreateInfos, 1, &vertexInputBindingDescription, 2, vertexInputAttributeDescriptions, 1.0f)) {
                     VulkanWrapper::destroyShaderModule(vert);

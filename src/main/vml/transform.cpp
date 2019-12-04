@@ -1,6 +1,6 @@
 #include "vml/transform.hpp"
 
-#define M_PI 3.1415926535897932384f
+const float PI = 3.1415926535897932384f;
 #include <cmath>
 
 namespace vml {
@@ -60,7 +60,7 @@ namespace vml {
             0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    mat4 orthoM4(float left, float right, float bottom, float top, float near, float far) {
+    mat4 orthographicM4(float left, float right, float bottom, float top, float near, float far) {
         mat4 out;
         out[0][0] = 2.0f / (right - left);
         out[3][0] = (left + right) / (left - right);
@@ -72,7 +72,7 @@ namespace vml {
         return out;
     }
     mat4 perspectiveM4(float aspectRatio, float fovPiRad, float near, float far) {
-        float s = 1.0f / std::tan(0.5f * M_PI * fovPiRad);
+        float s = 1.0f / std::tan(0.5f * PI * fovPiRad);
         mat4 out;
         out[0][0] = s;
         out[1][1] = -s * aspectRatio;
@@ -84,7 +84,7 @@ namespace vml {
 
     quaternion rotateQ(float rad, const vec3& axis) {
         vec3 unit = axis / axis.magnitude();
-        float s = std::sin(rad / 2);
+        float s = std::sinf(rad / 2);
         return quaternion(std::cos(rad / 2), s * unit[0], s * unit[1], s * unit[2]);
     }
     mat4 rotateM4(const quaternion& q) {

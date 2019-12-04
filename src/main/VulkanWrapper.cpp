@@ -76,7 +76,7 @@ namespace VulkanWrapper {
             QueueFamilyIndices indices;
             std::vector<vk::QueueFamilyProperties> queueFamilies = physicalDevice.getQueueFamilyProperties();
 
-            int i = 0;
+            uint32_t i = 0;
             for (const vk::QueueFamilyProperties& properties : queueFamilies) {
                 if (properties.queueCount > 0) {
                     if (properties.queueFlags & vk::QueueFlagBits::eGraphics) {
