@@ -1,10 +1,10 @@
 #ifndef MSCFINALPROJECT_VERTEX_HPP
 #define MSCFINALPROJECT_VERTEX_HPP
 
-#include "vml/vec3.hpp"
+#include <vml/vec3.hpp>
 
 namespace render {
-    struct Vertex {
+    struct vertex {
         vml::vec2 pos;
         vml::vec2 uv;
     };

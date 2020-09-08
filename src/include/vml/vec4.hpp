@@ -1,7 +1,7 @@
 #ifndef MSCFINALPROJECT_VML_VEC4_HPP
 #define MSCFINALPROJECT_VML_VEC4_HPP
 
-#include "vml/vec3.hpp"
+#include <vml/vec3.hpp>
 
 namespace vml {
     struct vec4 {

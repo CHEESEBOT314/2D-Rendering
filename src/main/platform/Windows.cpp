@@ -1,4 +1,4 @@
-#include "platform/Platform.hpp"
+#include "platform/platform.hpp"
 
 #include "windows.h"
 

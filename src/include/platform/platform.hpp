@@ -3,11 +3,11 @@
 
 #include <string>
 
-namespace Platform {
-    namespace Files {
+namespace platform {
+    namespace files {
         extern const char FILE_SEPARATOR;
-        std::string getResourceFolder();
-        void createFolder(const std::string& folder);
+        std::string get_resource_folder();
+        void create_folder(const std::string& folder);
     }
 }
 

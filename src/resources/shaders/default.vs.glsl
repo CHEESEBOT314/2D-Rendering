@@ -7,6 +7,7 @@ layout(push_constant) uniform Info {
     mat4 v;
     mat4 m;
     mat3 textureTransform;
+    mat4 colourMult;
 } info;
 
 layout(location = 0) in vec2 posIn;

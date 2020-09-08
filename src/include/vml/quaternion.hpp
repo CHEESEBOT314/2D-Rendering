@@ -1,7 +1,7 @@
 #ifndef MSCFINALPROJECT_VML_QUATERNION_HPP
 #define MSCFINALPROJECT_VML_QUATERNION_HPP
 
-#include "vml/vec4.hpp"
+#include <vml/vec4.hpp>
 
 namespace vml {
     struct quaternion {

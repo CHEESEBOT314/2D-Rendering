@@ -4,15 +4,15 @@
 #include "vulkan/vulkan.hpp"
 #include "GLFW/glfw3.h"
 
-namespace GlfwWrapper {
+namespace glfw_wrapper {
     std::vector<const char*> init();
-    bool createSurface(const vk::Instance& instance, vk::SurfaceKHR& surfaceKhr);
+    bool create_surface(const vk::Instance& instance, vk::SurfaceKHR& surface_khr);
 
-    void getResolution(int* width, int* height);
+    void get_resolution(int* width, int* height);
 
-    void pollEvents();
+    void poll_events();
 
-    bool shouldQuit();
+    bool should_quit();
     void terminate();
 }
 

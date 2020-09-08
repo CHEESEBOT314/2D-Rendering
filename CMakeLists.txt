@@ -23,16 +23,16 @@ if (DEBUG)
     add_definitions(-DDEBUG_MODE)
 endif()
 
-set(SOURCES src/main/Main.cpp
+set(SOURCES src/main/main.cpp
 
-        src/main/GlfwWrapper.cpp
-        src/main/Game.cpp
-        src/main/VulkanWrapper.cpp
+        src/main/glfw_wrapper.cpp
+        src/main/game.cpp
+        src/main/vulkan_wrapper.cpp
 
-        src/main/render/RenderManager.cpp
-        src/main/render/SpriteManager.cpp
+        src/main/render/render_manager.cpp
+        src/main/render/sprite_manager.cpp
 
-        src/main/resource/ResourceManager.cpp
+        src/main/resource/resource_manager.cpp
 
         src/main/vml/mat2.cpp
         src/main/vml/mat3.cpp

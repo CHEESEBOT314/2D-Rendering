@@ -1,29 +1,28 @@
-#include "resource/ResourceManager.hpp"
+#include "resource/resource_manager.hpp"
 
 #include <memory>
 #include <fstream>
 
-namespace resource::ResourceManager {
+namespace resource::resource_manager {
     namespace {
-        struct Info {
+        struct info {
             std::string folder;
             char separator = 0;
         };
-        std::unique_ptr<Info> info;
+        std::unique_ptr<info> info_p;
     }
     void init(const std::string& folder, char separator) {
-        info = std::make_unique<Info>();
-        info->folder = folder;
-        info->separator = separator;
+        info_p = std::make_unique<info>();
+        info_p->folder = folder;
+        info_p->separator = separator;
     }
-    std::vector<uint8_t> readBinaryFile(const std::string& fileName, const std::vector<std::string>& folders) {
-        std::string fullPath = info->folder;
+    std::vector<uint8_t> read_binary_file(const std::string& file_name, const std::vector<std::string>& folders) {
+        std::string fullPath = info_p->folder;
         for (const std::string& d : folders) {
             fullPath = fullPath.append(d);
-            fullPath = fullPath.append(&info->separator, 1);
+            fullPath = fullPath.append(&info_p->separator, 1);
         }
-        fullPath = fullPath.append(fileName);
-        printf("Reading file: %s\n", fullPath.c_str());
+        fullPath = fullPath.append(file_name);
         std::ifstream file(fullPath, std::ios::ate | std::ios::binary);
         if (!file.is_open()) {
             return {};

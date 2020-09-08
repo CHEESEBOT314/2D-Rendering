@@ -1,14 +1,14 @@
 #ifndef MSCFINALPROJECT_GAME_HPP
 #define MSCFINALPROJECT_GAME_HPP
 
-namespace Game {
+namespace game {
     void init();
 
     void render();
-    void handleEvent();
+    void handle_event();
     void update();
 
-    bool shouldQuit();
+    bool should_quit();
 
     void terminate();
 }

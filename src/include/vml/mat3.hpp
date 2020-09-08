@@ -1,8 +1,8 @@
 #ifndef MSCFINALPROJECT_VML_MAT3_HPP
 #define MSCFINALPROJECT_VML_MAT3_HPP
 
-#include "vml/vec3.hpp"
-#include "vml/mat2.hpp"
+#include <vml/vec3.hpp>
+#include <vml/mat2.hpp>
 
 namespace vml {
     struct mat3 {
